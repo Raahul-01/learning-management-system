@@ -1,0 +1,116 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include <algorithm>
+
+struct Book {
+    int id;
+    std::string title;
+    std::string author;
+    bool isIssued;
+
+    Book(int i, std::string t, std::string a, bool issued = false) 
+        : id(i), title(t), author(a), isIssued(issued) {}
+};
+
+std::vector<Book> books;
+
+void addBook(int id, std::string title, std::string author) {
+    books.push_back(Book(id, title, author));
+    std::cout << "Book added successfully!" << std::endl;
+}
+
+void searchBookByTitle(const std::string& title) {
+    for (const auto& book : books) {
+        if (book.title == title) {
+            std::cout << "Book found: ID=" << book.id << ", Title=" << book.title << ", Author=" << book.author << ", Status=" << (book.isIssued ? "Issued" : "Available") << std::endl;
+            return;
+        }
+    }
+    std::cout << "Book not found!" << std::endl;
+}
+
+void searchBookById(int id) {
+    for (const auto& book : books) {
+        if (book.id == id) {
+            std::cout << "Book found: ID=" << book.id << ", Title=" << book.title << ", Author=" << book.author << ", Status=" << (book.isIssued ? "Issued" : "Available") << std::endl;
+            return;
+        }
+    }
+    std::cout << "Book not found!" << std::endl;
+}
+
+struct IssuedBook {
+    int bookId;
+    std::string studentName;
+
+    IssuedBook(int id, std::string name) : bookId(id), studentName(name) {}
+};
+
+std::vector<IssuedBook> issuedBooks;
+
+void issueBook(int id, std::string studentName) {
+    for (auto& book : books) {
+        if (book.id == id && !book.isIssued) {
+            book.isIssued = true;
+            issuedBooks.push_back(IssuedBook(id, studentName));
+            std::cout << "Book issued successfully to " << studentName << std::endl;
+            return;
+        }
+    }
+    std::cout << "Book not available for issue!" << std::endl;
+}
+
+void returnBook(int id) {
+    for (auto& book : books) {
+        if (book.id == id && book.isIssued) {
+            book.isIssued = false;
+            for (auto it = issuedBooks.begin(); it != issuedBooks.end(); ++it) {
+                if (it->bookId == id) {
+                    issuedBooks.erase(it);
+                    std::cout << "Book returned successfully!" << std::endl;
+                    return;
+                }
+            }
+        }
+    }
+    std::cout << "Book was not issued!" << std::endl;
+}
+
+void listAllBooks() {
+    std::sort(books.begin(), books.end(), [](const Book& a, const Book& b) {
+        return a.id < b.id; // Change to a.title < b.title for sorting by title
+    });
+
+    for (const auto& book : books) {
+        std::cout << "ID=" << book.id << ", Title=" << book.title << ", Author=" << book.author << ", Status=" << (book.isIssued ? "Issued" : "Available") << std::endl;
+    }
+}
+
+void deleteBook(int id) {
+    for (auto it = books.begin(); it != books.end(); ++it) {
+        if (it->id == id) {
+            books.erase(it);
+            std::cout << "Book deleted successfully!" << std::endl;
+            return;
+        }
+    }
+    std::cout << "Book not found!" << std::endl;
+}
+
+int main() {
+    // Sample data
+    addBook(1, "C++ Programming", "Rahul");
+    addBook(2, "Effective C++", "Rahul");
+    addBook(3, "The C++ Standard Library", "Rahul");
+
+    // Test the functionalities
+    searchBookByTitle("Effective C++");
+    issueBook(2, "Ramesh");
+    returnBook(2);
+    listAllBooks();
+    deleteBook(3);
+
+    return 0;
+}
+
